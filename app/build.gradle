@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'fr.velovmontre'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'fr.velovmontre'
+        minSdk 33
+        targetSdk 36
+        versionCode 9
+        versionName '1.0.0'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.viewpager:viewpager:1.0.0'
+    implementation 'androidx.wear.tiles:tiles:1.6.2'
+    implementation 'androidx.wear.protolayout:protolayout:1.4.2'
+    implementation 'com.google.guava:guava:33.3.1-jre'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    testImplementation 'junit:junit:4.13.2'
+}

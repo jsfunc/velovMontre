@@ -1,0 +1,41 @@
+Vélo’v endpoint experiment
+===========================
+Completed 12/12 rounds.
+Five seconds includes DNS, TCP, TLS, redirects and the full response body.
+Three concurrent requests per round; fresh connection per request, HTTP/1.1 + gzip.
+Results apply to this computer/network; concurrency and curl differ from the watch.
+Fresh = valid known state with observation AND feed timestamps less than 300 s old.
+
+Endpoint        N  HTTP200<=5s  Parsed  All4fresh  Median(s)  Max(s)
+cyclocity       12   12/12        12       0           0.231   0.245
+  7046: known 12/12, fresh 0/12, median data age 68125.3s
+  7012: known 12/12, fresh 0/12, median data age 15797.3s
+  7006: known 12/12, fresh 0/12, median data age 14836.3s
+  7013: known 12/12, fresh 0/12, median data age 23330.3s
+lyon_gbfs       12   12/12        12       0           0.227   0.296
+  7046: known 12/12, fresh 0/12, median data age 68125.2s
+  7012: known 12/12, fresh 0/12, median data age 15797.2s
+  7006: known 12/12, fresh 0/12, median data age 14836.2s
+  7013: known 12/12, fresh 0/12, median data age 23330.2s
+lyon_geojson    12   12/12        12       9           0.252   0.366
+  7046: known 12/12, fresh 12/12, median data age 152.3s
+  7012: known 12/12, fresh 12/12, median data age 69.3s
+  7006: known 12/12, fresh 9/12, median data age 231.3s
+  7013: known 12/12, fresh 10/12, median data age 210.3s
+
+Freshness comparisons within the same round (observation timestamp; ties allowed):
+  7046: 12 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 12}
+  7012: 12 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 12}
+  7006: 12 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 12}
+  7013: 12 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 12}
+
+Timestamp consistency (counts changing under one reported_at value):
+  cyclocity / 7046: counts [19, 20], unchanged timestamp 1791854253.0
+  cyclocity / 7012: counts [12, 13], unchanged timestamp 1791906581.0
+  lyon_gbfs / 7046: counts [19, 20], unchanged timestamp 1791854253.0
+  lyon_gbfs / 7012: counts [12, 13], unchanged timestamp 1791906581.0
+WARNING: old reported timestamps do not prove the counts themselves are old.
+
+Latency statistics exclude errors and timeouts; timed-out requests are censored at 5 s.
+A short experiment cannot establish long-term reliability or watch latency.
+Review success rates, four-station freshness and latency together before choosing an order.

@@ -1,0 +1,52 @@
+# Android / Gradle generated files
+.gradle/
+.kotlin/
+build/
+local.properties
+.externalNativeBuild/
+.cxx/
+captures/
+*.apk
+*.aab
+*.ap_
+*.idsig
+
+# Local signing material and credentials
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+.env
+.env.*
+!.env.example
+/.aws/
+/.codex/
+/.agents/
+
+# IDE and operating-system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Keep summaries, normalized measurements and named watch runs in Git.
+# Raw captures and the replaceable latest-watch export stay local.
+/experiments/**/*.body
+/experiments/**/*.headers
+/experiments/watch-benchmark.json
+/experiments/*.tar
+/experiments/*.tar.gz
+
+# The Gradle wrapper JAR is required and must be committed.
+!gradle/wrapper/gradle-wrapper.jar

@@ -1,0 +1,37 @@
+Vélo’v endpoint experiment
+===========================
+Completed 1/12 rounds.
+Five seconds includes DNS, TCP, TLS, redirects and the full response body.
+Three concurrent requests per round; fresh connection per request, HTTP/1.1 + gzip.
+Results apply to this computer/network; concurrency and curl differ from the watch.
+Fresh = valid known state with observation AND feed timestamps less than 300 s old.
+
+Endpoint        N  HTTP200<=5s  Parsed  All4fresh  Median(s)  Max(s)
+cyclocity        1    0/1          0       0             n/a     n/a
+  1x curl: (6) Could not resolve host: api.cyclocity.fr
+  7046: known 0/1, fresh 0/1, median data age n/a
+  7012: known 0/1, fresh 0/1, median data age n/a
+  7006: known 0/1, fresh 0/1, median data age n/a
+  7013: known 0/1, fresh 0/1, median data age n/a
+lyon_gbfs        1    0/1          0       0             n/a     n/a
+  1x curl: (6) Could not resolve host: download.data.grandlyon.com
+  7046: known 0/1, fresh 0/1, median data age n/a
+  7012: known 0/1, fresh 0/1, median data age n/a
+  7006: known 0/1, fresh 0/1, median data age n/a
+  7013: known 0/1, fresh 0/1, median data age n/a
+lyon_geojson     1    0/1          0       0             n/a     n/a
+  1x curl: (6) Could not resolve host: data.grandlyon.com
+  7046: known 0/1, fresh 0/1, median data age n/a
+  7012: known 0/1, fresh 0/1, median data age n/a
+  7006: known 0/1, fresh 0/1, median data age n/a
+  7013: known 0/1, fresh 0/1, median data age n/a
+
+Freshness comparisons within the same round (observation timestamp; ties allowed):
+  7046: 0 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 0}
+  7012: 0 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 0}
+  7006: 0 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 0}
+  7013: 0 comparable rounds; newest/tied {'cyclocity': 0, 'lyon_gbfs': 0, 'lyon_geojson': 0}
+
+Latency statistics exclude errors and timeouts; timed-out requests are censored at 5 s.
+A short experiment cannot establish long-term reliability or watch latency.
+NO VALID DATA: no endpoint ranking or freshness conclusion is justified.
