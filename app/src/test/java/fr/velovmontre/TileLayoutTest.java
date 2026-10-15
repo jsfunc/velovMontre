@@ -14,6 +14,23 @@ import static org.junit.Assert.*;
 public class TileLayoutTest {
     private static final long NOW = Instant.parse("2026-10-13T18:00:00Z").toEpochMilli();
 
+    @Test public void synchronizedGroupsReplaceDefaultsAndEmptyGroupHasAnExplanation() {
+        var selection = new fr.velovmontre.selection.StationSelection(1, 1, List.of(
+                List.of(new fr.velovmontre.selection.StationSelection.Choice("1001", "Terreaux / Terme")), List.of()));
+        var snapshot = new Availability.Snapshot(NOW, NOW, "test", Map.of(
+                "1001", new Availability.Station("1001", 5, true, true, NOW, 0, 0, null, 2, 3, true)));
+        var result = new AvailabilityRepository.Result(snapshot, false);
+        var entries = new TileLayout().build(result, 192, 192, NOW, 0, selection).getTileTimeline().getTimelineEntries();
+        assertEquals("Terreaux: 2-3-5", rowText(entries.get(1), 0).getText().getValue());
+        var root = (LayoutElementBuilders.Box) entries.get(1).getLayout().getRoot();
+        assertEquals(1, ((LayoutElementBuilders.Column) root.getContents().get(0)).getContents().size());
+        var empty = new TileLayout().build(result, 192, 192, NOW, 1, selection).getTileTimeline().getTimelineEntries();
+        assertEquals(1, empty.size());
+        var emptyRoot = (LayoutElementBuilders.Box) empty.get(0).getLayout().getRoot();
+        var column = (LayoutElementBuilders.Column) emptyRoot.getContents().get(0);
+        assertEquals("Choisir sur le téléphone", ((LayoutElementBuilders.Text) column.getContents().get(0)).getText().getValue());
+    }
+
     @Test public void rowsChangeColourAndExpireIndependentlyWithoutNetwork() {
         var snapshot = new Availability.Snapshot(NOW, NOW, "test", Map.of(
                 "7046", new Availability.Station("7046", 8, true, true, NOW),
@@ -84,6 +101,34 @@ public class TileLayoutTest {
         var entries = new TileLayout().build(new AvailabilityRepository.Result(snapshot, false),
                 192, 192, NOW).getTileTimeline().getTimelineEntries();
         for (var entry : entries) assertEquals("Mérieux: _-_-_", rowText(entry, 1).getText().getValue());
+    }
+
+    @Test public void offlineTimelineKeepsAbsoluteDescriptionsAndLargeRefreshTarget() {
+        var snapshot = new Availability.Snapshot(NOW, NOW, "test", Map.of(
+                "7046", new Availability.Station("7046", 8, true, true, NOW)));
+        var entries = new TileLayout().build(new AvailabilityRepository.Result(snapshot, false),
+                192, 192, NOW).getTileTimeline().getTimelineEntries();
+        String initial = null;
+        for (var entry : entries) {
+            var root = (LayoutElementBuilders.Box) entry.getLayout().getRoot();
+            assertEquals("refresh", root.getModifiers().getClickable().getId());
+            assertTrue(root.getModifiers().getClickable().getOnClick()
+                    instanceof androidx.wear.protolayout.ActionBuilders.LoadAction);
+            assertTrue(root.getWidth() instanceof androidx.wear.protolayout.DimensionBuilders.ExpandedDimensionProp);
+            assertTrue(root.getHeight() instanceof androidx.wear.protolayout.DimensionBuilders.ExpandedDimensionProp);
+            var column = (LayoutElementBuilders.Column) root.getContents().get(0);
+            var row = (LayoutElementBuilders.Box) column.getContents().get(0);
+            String description = row.getModifiers().getSemantics().getContentDescription().getValue();
+            assertTrue(description.contains("Place de l’École"));
+            assertFalse(description.contains("minutes"));
+            if (entry.getValidity() != null) {
+                assertTrue(description.contains("13/10/2026"));
+                if (initial == null) initial = description;
+                assertEquals(initial, description);
+            } else {
+                assertFalse(description.contains("8 places libres"));
+            }
+        }
     }
 
     @Test public void bikesRemainVisibleAndExpireEvenWhenDocksAreUnknown() {

@@ -1,6 +1,7 @@
 package fr.velovmontre;
 
 import static androidx.wear.protolayout.DimensionBuilders.dp;
+import static androidx.wear.protolayout.DimensionBuilders.em;
 import static androidx.wear.protolayout.DimensionBuilders.expand;
 import static androidx.wear.protolayout.DimensionBuilders.sp;
 import androidx.wear.protolayout.ActionBuilders;
@@ -23,11 +24,17 @@ public final class TileLayout {
     }
 
     public TileBuilders.Tile build(AvailabilityRepository.Result result, float width, float height, long now, int page) {
+        return build(result, width, height, now, page, fr.velovmontre.selection.StationSelection.defaults());
+    }
+
+    public TileBuilders.Tile build(AvailabilityRepository.Result result, float width, float height, long now, int page,
+                                  fr.velovmontre.selection.StationSelection selection) {
         result = new AvailabilityRepository.Result(result.snapshot().displayableAt(now), result.failed());
         float scale = Math.min(1.2f, Math.max(0.85f, Math.min(width, height) / 192f));
         TreeSet<Long> boundaries = new TreeSet<>();
         boundaries.add(now);
-        for (String id : Availability.PAGES.get(page)) {
+        for (var station : selection.groups().get(page)) {
+            String id = station.id();
             for (Availability.Metric metric : Availability.Metric.values()) {
                 Availability.Reading reading = result.snapshot().reading(id, metric);
                 if (reading == null || !reading.visible(now)) continue;
@@ -41,12 +48,12 @@ public final class TileLayout {
         TimelineBuilders.Timeline.Builder timeline = new TimelineBuilders.Timeline.Builder();
         // Outside the known timeline, discard all counts even if background updates stop.
         timeline.addTimelineEntry(new TimelineBuilders.TimelineEntry.Builder()
-                .setLayout(layout(result, now, now, scale, true, page)).build());
+                .setLayout(layout(result, now, now, scale, true, page, selection)).build());
         for (int i = 0; i < times.size() - 1; i++) {
             timeline.addTimelineEntry(new TimelineBuilders.TimelineEntry.Builder()
                     .setValidity(new TimelineBuilders.TimeInterval.Builder()
                             .setStartMillis(times.get(i)).setEndMillis(times.get(i + 1)).build())
-                    .setLayout(layout(result, now, times.get(i), scale, false, page)).build());
+                    .setLayout(layout(result, now, times.get(i), scale, false, page, selection)).build());
         }
         // With no future expiry, no count is displayable.
         return new TileBuilders.Tile.Builder().setResourcesVersion("1")
@@ -56,9 +63,10 @@ public final class TileLayout {
     }
 
     private LayoutElementBuilders.Layout layout(AvailabilityRepository.Result result, long referenceTime,
-                                                 long now, float scale, boolean discard, int page) {
+                                                 long now, float scale, boolean discard, int page, fr.velovmontre.selection.StationSelection selection) {
         LayoutElementBuilders.Column.Builder column = new LayoutElementBuilders.Column.Builder();
-        for (String id : Availability.PAGES.get(page)) {
+        for (var station : selection.groups().get(page)) {
+            String id = station.id();
             boolean known = !discard && result.snapshot().showAnyCount(id, referenceTime);
             column.addContent(new LayoutElementBuilders.Box.Builder()
                     .setWidth(dp(148 * scale)).setHeight(dp(18 * scale))
@@ -67,17 +75,21 @@ public final class TileLayout {
                                     .setOnClick(new ActionBuilders.LoadAction.Builder().build()).build())
                             .setSemantics(new ModifiersBuilders.Semantics.Builder()
                                     .setContentDescription(known
-                                            ? StationPresentation.description(result.snapshot(), id, now)
-                                            : StationPresentation.shortName(id) + ", disponibilité inconnue ou expirée. Toucher pour actualiser.")
+                                            ? StationPresentation.description(result.snapshot(), id, now, true, station.name())
+                                            : StationPresentation.description(Availability.Snapshot.empty(), id, now, true, station.name()))
                                     .build()).build())
-                    .addContent(text(known ? StationPresentation.row(result.snapshot(), id, now)
-                                    : StationPresentation.shortName(id) + ": _-_-_", 12 * scale,
+                    .addContent(text(known ? StationPresentation.abbreviated(station.name()) + ": " + StationPresentation.value(result.snapshot(), id, now)
+                                    : StationPresentation.abbreviated(station.name()) + ": _-_-_", 12 * scale,
                             known ? StationPresentation.color(result.snapshot(), id, now)
                                     : StationPresentation.RED)).build());
         }
+        if (selection.groups().get(page).isEmpty()) column.addContent(text("Choisir sur le téléphone", 12 * scale, StationPresentation.MUTED));
         return new LayoutElementBuilders.Layout.Builder().setRoot(new LayoutElementBuilders.Box.Builder()
                 .setWidth(expand()).setHeight(expand())
                 .setModifiers(new ModifiersBuilders.Modifiers.Builder()
+                        // All rows perform the same action; gaps and margins are also a refresh target.
+                        .setClickable(new ModifiersBuilders.Clickable.Builder().setId("refresh")
+                                .setOnClick(new ActionBuilders.LoadAction.Builder().build()).build())
                         .setBackground(new ModifiersBuilders.Background.Builder()
                                 .setColor(ColorBuilders.argb(0xFF000000)).build())
                         .build())
@@ -88,6 +100,8 @@ public final class TileLayout {
         return new LayoutElementBuilders.Text.Builder().setText(value).setMaxLines(1)
                 .setFontStyle(new LayoutElementBuilders.FontStyle.Builder().setSize(sp(size))
                         .setWeight(LayoutElementBuilders.FONT_WEIGHT_BOLD)
+                        // Supported by older Tile renderers that cannot select a condensed font.
+                        .setLetterSpacing(em(-0.025f))
                         .setColor(ColorBuilders.argb(color)).build()).build();
     }
 }

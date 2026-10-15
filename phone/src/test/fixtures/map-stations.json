@@ -1,0 +1,176 @@
+[
+  {
+    "group": 0,
+    "total": 8,
+    "missing": 0,
+    "stations": [
+      {
+        "id": "7046",
+        "name": "PLACE DE L'ECOLE",
+        "lat": 45.730083,
+        "lng": 4.82781,
+        "value": "2-1-5",
+        "color": "#64e4c0",
+        "description": "7046 - PLACE DE L'ECOLE, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "7012",
+        "name": "MERIEUX / PAVILLONS",
+        "lat": 45.7291359373026,
+        "lng": 4.8301170098658,
+        "value": "3-2-6",
+        "color": "#64e4c0",
+        "description": "7012 - MERIEUX / PAVILLONS, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "7006",
+        "name": "GERLAND",
+        "lat": 45.727494,
+        "lng": 4.831145,
+        "value": "4-3-7",
+        "color": "#64e4c0",
+        "description": "7006 - GERLAND, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "7013",
+        "name": "HALLE TONY GARNIER",
+        "lat": 45.730786,
+        "lng": 4.823733,
+        "value": "5-4-8",
+        "color": "#64e4c0",
+        "description": "7013 - HALLE TONY GARNIER, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "7049",
+        "name": "CITÉ SCOLAIRE INTERNATIONALE",
+        "lat": 45.727951,
+        "lng": 4.823563,
+        "value": "6-5-9",
+        "color": "#64e4c0",
+        "description": "7049 - CITÉ SCOLAIRE INTERNATIONALE, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "7005",
+        "name": "DEBOURG",
+        "lat": 45.73182,
+        "lng": 4.833996,
+        "value": "7-6-10",
+        "color": "#64e4c0",
+        "description": "7005 - DEBOURG, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "7007",
+        "name": "FARGE / AYASSE",
+        "lat": 45.735741,
+        "lng": 4.827725,
+        "value": "8-7-11",
+        "color": "#64e4c0",
+        "description": "7007 - FARGE / AYASSE, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "2020",
+        "name": "MUSÉE DES CONFLUENCES",
+        "lat": 45.733388,
+        "lng": 4.818954,
+        "value": "9-8-12",
+        "color": "#64e4c0",
+        "description": "2020 - MUSÉE DES CONFLUENCES, données de démonstration.",
+        "freshness": "Données de démonstration"
+      }
+    ]
+  },
+  {
+    "group": 1,
+    "total": 8,
+    "missing": 0,
+    "stations": [
+      {
+        "id": "5030",
+        "name": "CHARCOT / RÉSIDENCE UNIVERSITAIRE",
+        "lat": 45.755054,
+        "lng": 4.807811,
+        "value": "2-1-5",
+        "color": "#64e4c0",
+        "description": "5030 - CHARCOT / RÉSIDENCE UNIVERSITAIRE, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "5047",
+        "name": "ALBÉRIC PONT",
+        "lat": 45.753452,
+        "lng": 4.804401,
+        "value": "3-2-6",
+        "color": "#64e4c0",
+        "description": "5047 - ALBÉRIC PONT, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "5008",
+        "name": "SAINTE-IRÉNÉE",
+        "lat": 45.754978,
+        "lng": 4.812427,
+        "value": "4-3-7",
+        "color": "#64e4c0",
+        "description": "5008 - SAINTE-IRÉNÉE, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "5016",
+        "name": "POINT DU JOUR / GRANGES",
+        "lat": 45.756204,
+        "lng": 4.802727,
+        "value": "5-4-8",
+        "color": "#64e4c0",
+        "description": "5016 - POINT DU JOUR / GRANGES, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "5007",
+        "name": "PLACE DE TRION",
+        "lat": 45.757916,
+        "lng": 4.81317,
+        "value": "6-5-9",
+        "color": "#64e4c0",
+        "description": "5007 - PLACE DE TRION, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "5001",
+        "name": "PLACE VARILLON (FUNICULAIRE ST JUST)",
+        "lat": 45.757319,
+        "lng": 4.815064,
+        "value": "7-6-10",
+        "color": "#64e4c0",
+        "description": "5001 - PLACE VARILLON (FUNICULAIRE ST JUST), données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "5053",
+        "name": "SAINT-JUST",
+        "lat": 45.75597,
+        "lng": 4.818904,
+        "value": "8-7-11",
+        "color": "#64e4c0",
+        "description": "5053 - SAINT-JUST, données de démonstration.",
+        "freshness": "Données de démonstration"
+      },
+      {
+        "id": "5015",
+        "name": "FULCHIRON",
+        "lat": 45.75197,
+        "lng": 4.821662,
+        "value": "9-8-12",
+        "color": "#64e4c0",
+        "description": "5015 - FULCHIRON, données de démonstration.",
+        "freshness": "Données de démonstration"
+      }
+    ]
+  }
+]

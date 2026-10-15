@@ -82,6 +82,7 @@ public class VelovTileService extends TileService {
             androidx.wear.tiles.RequestBuilders.TileRequest request) {
         return new TileLayout().build(result,
                 request.getDeviceConfiguration().getScreenWidthDp(),
-                request.getDeviceConfiguration().getScreenHeightDp(), System.currentTimeMillis(), stationPage());
+                request.getDeviceConfiguration().getScreenHeightDp(), System.currentTimeMillis(), stationPage(),
+                ((VelovApplication) getApplication()).selection().current());
     }
 }

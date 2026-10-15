@@ -8,8 +8,19 @@ android {
         applicationId 'fr.velovmontre'
         minSdk 33
         targetSdk 36
-        versionCode 9
-        versionName '1.0.0'
+        versionCode 16
+        versionName '1.1.1'
+    }
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+            jvmArgs '--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.base/java.util=ALL-UNNAMED',
+                    '--add-opens=java.base/java.io=ALL-UNNAMED', '--add-opens=java.base/java.net=ALL-UNNAMED',
+                    '--add-opens=java.base/java.security=ALL-UNNAMED', '--add-opens=java.base/java.text=ALL-UNNAMED',
+                    '--add-opens=java.base/jdk.internal.access=ALL-UNNAMED', '--add-opens=java.desktop/java.awt.font=ALL-UNNAMED',
+                    '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED'
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -21,7 +32,7 @@ dependencies {
     implementation 'androidx.viewpager:viewpager:1.0.0'
     implementation 'androidx.wear.tiles:tiles:1.6.2'
     implementation 'androidx.wear.protolayout:protolayout:1.4.2'
-    implementation 'com.google.guava:guava:33.3.1-jre'
-    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation project(':shared')
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.17'
 }

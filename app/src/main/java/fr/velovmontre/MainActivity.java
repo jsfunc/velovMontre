@@ -8,6 +8,10 @@ import android.os.Looper;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
+import android.view.InputDevice;
+import android.view.MotionEvent;
+import android.view.ViewConfiguration;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -27,7 +31,10 @@ public final class MainActivity extends Activity {
     private AvailabilityRepository repository;
     private ViewPager pager;
     private boolean refreshing;
+    private boolean paging;
+    private fr.velovmontre.selection.StationSelection selection;
     private final Map<String, TextView> rows = new LinkedHashMap<>();
+    private final Map<Integer, ScrollView> pages = new LinkedHashMap<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable ticker = new Runnable() {
         @Override public void run() {
@@ -45,11 +52,13 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         repository = ((VelovApplication) getApplication()).repository();
+        selection = ((VelovApplication) getApplication()).selection().current();
         pager = new ViewPager(this);
         pager.setBackgroundColor(0xFF000000);
-        pager.setOffscreenPageLimit(Availability.PAGES.size() - 1);
+        pager.setOffscreenPageLimit(selection.groups().size() - 1);
         pager.setAdapter(new PagerAdapter() {
-            @Override public int getCount() { return Availability.PAGES.size(); }
+            @Override public int getItemPosition(Object object) { return POSITION_NONE; }
+            @Override public int getCount() { return selection.groups().size(); }
             @Override public boolean isViewFromObject(View view, Object object) { return view == object; }
             @Override public Object instantiateItem(ViewGroup container, int position) {
                 View page = stationPage(position);
@@ -58,11 +67,19 @@ public final class MainActivity extends Activity {
             }
             @Override public void destroyItem(ViewGroup container, int position, Object object) {
                 container.removeView((View) object);
-                for (String id : Availability.PAGES.get(position)) rows.remove(id);
+                pages.remove(position);
+                // Rows are replaced when a new configuration rebuilds the pages.
+            }
+        });
+        pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override public void onPageSelected(int position) { render(); }
+            @Override public void onPageScrollStateChanged(int state) {
+                paging = state != ViewPager.SCROLL_STATE_IDLE;
+                render();
             }
         });
         setContentView(pager);
-        if (state != null) pager.setCurrentItem(Math.max(0, Math.min(Availability.PAGES.size() - 1,
+        if (state != null) pager.setCurrentItem(Math.max(0, Math.min(selection.groups().size() - 1,
                 state.getInt("stationPage", 0))), false);
     }
 
@@ -86,12 +103,13 @@ public final class MainActivity extends Activity {
                     .setPositiveButton("OK", null).show();
             return true;
         });
-        for (String id : Availability.PAGES.get(page)) {
+        for (var station : selection.groups().get(page)) {
+            String id = station.id();
             TextView row = new TextView(this);
             row.setGravity(Gravity.CENTER);
             row.setSingleLine(true);
             row.setIncludeFontPadding(false);
-            row.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            row.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
             row.setOnClickListener(this::manualRefresh);
             row.setOnLongClickListener(view -> content.performLongClick());
             row.setAutoSizeTextTypeUniformWithConfiguration(10, 18, 1, TypedValue.COMPLEX_UNIT_SP);
@@ -99,9 +117,30 @@ public final class MainActivity extends Activity {
                     ViewGroup.LayoutParams.MATCH_PARENT, dp(25)));
             rows.put(id, row);
         }
+        if (selection.groups().get(page).isEmpty()) {
+            TextView empty = new TextView(this);
+            empty.setText("Choisissez des stations\nsur le téléphone");
+            empty.setGravity(Gravity.CENTER);
+            empty.setTextColor(StationPresentation.MUTED);
+            content.addView(empty);
+        }
         scroll.addView(content);
-        render();
+        pages.put(page, scroll);
+        renderPage(page, repository.current().snapshot(), System.currentTimeMillis());
         return scroll;
+    }
+
+    @Override public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_SCROLL && event.isFromSource(InputDevice.SOURCE_ROTARY_ENCODER)) {
+            ScrollView scroll = pages.get(pager.getCurrentItem());
+            if (scroll != null) {
+                float delta = -event.getAxisValue(MotionEvent.AXIS_SCROLL)
+                        * ViewConfiguration.get(this).getScaledVerticalScrollFactor();
+                scroll.scrollBy(0, Math.round(delta));
+                return true;
+            }
+        }
+        return super.dispatchGenericMotionEvent(event);
     }
 
     @Override protected void onResume() {
@@ -134,18 +173,35 @@ public final class MainActivity extends Activity {
         refreshing = false;
         if (isDestroyed()) return;
         render();
-        VelovTileService.requestUpdates(this);
     }
 
     private void render() {
+        var latest = ((VelovApplication) getApplication()).selection().current();
+        if (!latest.equals(selection)) {
+            selection = latest;
+            rows.clear();
+            pager.getAdapter().notifyDataSetChanged();
+        }
         long now = System.currentTimeMillis();
         Availability.Snapshot snapshot = repository.current().snapshot();
-        for (Map.Entry<String, TextView> entry : rows.entrySet()) {
-            String id = entry.getKey();
-            TextView row = entry.getValue();
-            row.setText(StationPresentation.row(snapshot, id, now));
-            row.setTextColor(StationPresentation.color(snapshot, id, now));
-            row.setContentDescription(StationPresentation.description(snapshot, id, now));
+        if (paging) {
+            for (int page : pages.keySet()) renderPage(page, snapshot, now);
+        } else {
+            renderPage(pager.getCurrentItem(), snapshot, now);
+        }
+    }
+
+    private void renderPage(int page, Availability.Snapshot snapshot, long now) {
+        for (var station : selection.groups().get(page)) {
+            String id = station.id();
+            TextView row = rows.get(id);
+            if (row == null) continue;
+            String text = StationPresentation.abbreviated(station.name()) + ": " + StationPresentation.value(snapshot, id, now);
+            int color = StationPresentation.color(snapshot, id, now);
+            String description = StationPresentation.description(snapshot, id, now, false, station.name());
+            if (!TextUtils.equals(row.getText(), text)) row.setText(text);
+            if (row.getCurrentTextColor() != color) row.setTextColor(color);
+            if (!TextUtils.equals(row.getContentDescription(), description)) row.setContentDescription(description);
         }
     }
 

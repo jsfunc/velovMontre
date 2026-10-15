@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Vélo’v Montre</string>
-    <string name="tile_name">Vélo’v · disponibilités</string>
-    <string name="tile_name_west">Vélo’v · Lyon 5e</string>
+    <string name="tile_name">Vélo’v · groupe 1</string>
+    <string name="tile_name_west">Vélo’v · groupe 2</string>
 </resources>

@@ -1,0 +1,16 @@
+apply plugin: 'com.android.library'
+android {
+    namespace 'fr.velovmontre.shared'
+    compileSdk 36
+    defaultConfig { minSdk 33 }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+dependencies {
+    api 'com.google.guava:guava:33.3.1-android'
+    api 'com.google.code.gson:gson:2.11.0'
+    api 'com.google.android.gms:play-services-wearable:20.0.1'
+    testImplementation 'junit:junit:4.13.2'
+}
